@@ -124,9 +124,12 @@ The `Jenkinsfile` stages are:
 3. **Run Unit Tests** (inside Dockerized Maven container).
 4. **Build JAR** (inside Dockerized Maven container).
 5. **Build Docker Image** (`scientific-calculator:latest` and build number tag).
-6. **Smoke Test** by running container and calling API endpoint.
+6. **Smoke Test** by running a temporary container on host port `8082`.
+7. **Deploy Docker Container** by running app container on host port `8081`.
 
-If all steps pass, pipeline is successful.
+If all steps pass, pipeline is successful and app stays deployed at:
+
+- `http://localhost:8081`
 
 ---
 
@@ -164,6 +167,11 @@ If all steps pass, pipeline is successful.
 
 - **Port conflict (8080/8081)**
   - Change host port in `docker run` / `docker-compose.yml`.
+
+- **App not visible on localhost:8081 after pipeline**
+  - Confirm `Deploy Docker Container` stage succeeded.
+  - Run `docker ps` and check container name `scientific-calculator-app`.
+  - If Jenkins runs on another machine/VM, open `http://<jenkins-host-ip>:8081` instead of your own localhost.
 
 ---
 
