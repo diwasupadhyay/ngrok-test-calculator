@@ -84,8 +84,7 @@ pipeline {
                             @echo on
                             docker rm -f %SMOKE_CONTAINER_NAME% >NUL 2>&1 || echo No previous smoke container
                             docker run -d --name %SMOKE_CONTAINER_NAME% -p 8082:8080 %IMAGE_NAME%:latest
-                            timeout /t 15 /nobreak
-                            powershell -NoProfile -Command "$r = Invoke-WebRequest -Uri 'http://localhost:8082/api/calculate?operation=add&a=2&b=3' -UseBasicParsing; if ($r.StatusCode -ne 200) { exit 1 }"
+                            powershell -NoProfile -Command "$url='http://localhost:8082/api/calculate?operation=add&a=2&b=3'; $ok=$false; for($i=0;$i -lt 20;$i++){ try { $r=Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5; if($r.StatusCode -eq 200){$ok=$true; break} } catch {}; Start-Sleep -Seconds 2 }; if(-not $ok){ exit 1 }"
                             if errorlevel 1 (
                                 docker logs --tail 100 %SMOKE_CONTAINER_NAME%
                                 exit /b 1
@@ -116,8 +115,7 @@ pipeline {
                                 docker ps -a
                                 exit /b 1
                             )
-                            timeout /t 5 /nobreak
-                            powershell -NoProfile -Command "$r = Invoke-WebRequest -Uri 'http://localhost:8090/api/calculate?operation=add&a=2&b=3' -UseBasicParsing; if ($r.StatusCode -ne 200) { exit 1 }"
+                            powershell -NoProfile -Command "$url='http://localhost:8090/api/calculate?operation=add&a=2&b=3'; $ok=$false; for($i=0;$i -lt 20;$i++){ try { $r=Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5; if($r.StatusCode -eq 200){$ok=$true; break} } catch {}; Start-Sleep -Seconds 2 }; if(-not $ok){ exit 1 }"
                             if errorlevel 1 (
                                 docker logs --tail 100 %DEPLOY_CONTAINER_NAME%
                                 exit /b 1
