@@ -6,7 +6,7 @@ It includes:
 - A browser UI (`/`) and REST API (`/api/calculate`)
 - Unit and controller tests
 - `Dockerfile` for containerization
-- `Jenkinsfile` for CI/CD pipeline
+- `Jenkinsfile` for CI/CD pipeline (Maven steps run inside Docker)
 - ngrok webhook setup guide in `GUIDE.md`
 
 ## Quick Start
@@ -33,4 +33,4 @@ Open: `http://localhost:8080`
 mvn test
 ```
 
-For complete CI/CD + ngrok webhook setup, follow `GUIDE.md` and try.
+For complete CI/CD + ngrok webhook setup, follow `GUIDE.md`.

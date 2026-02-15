@@ -120,10 +120,11 @@ Now every `git push` should trigger Jenkins pipeline automatically.
 The `Jenkinsfile` stages are:
 
 1. **Checkout** source from GitHub.
-2. **Run Unit Tests** (`mvn clean test`).
-3. **Build JAR** (`mvn clean package -DskipTests`).
-4. **Build Docker Image** (`scientific-calculator:latest` and build number tag).
-5. **Smoke Test** by running container and calling API endpoint.
+2. **Validate Environment** (`docker --version`).
+3. **Run Unit Tests** (inside Dockerized Maven container).
+4. **Build JAR** (inside Dockerized Maven container).
+5. **Build Docker Image** (`scientific-calculator:latest` and build number tag).
+6. **Smoke Test** by running container and calling API endpoint.
 
 If all steps pass, pipeline is successful.
 
@@ -149,9 +150,13 @@ If all steps pass, pipeline is successful.
   - Check webhook URL ends with `/github-webhook/`.
   - Check GitHub webhook recent deliveries for status code.
 
-- **`mvn` not found in Jenkins**
-  - Install Maven in Jenkins host and ensure PATH is set.
-  - Or configure Maven in Jenkins Global Tool Configuration.
+- **Stage logs show only "Get contextual object from internal APIs"**
+  - Usually an earlier stage failed and next stages were skipped.
+  - Open full console output and check the first failed command.
+
+- **`dockerDesktopLinuxEngine` / Docker daemon not found**
+  - Start Docker Desktop and ensure Linux containers mode is active.
+  - Re-run the pipeline after Docker is healthy.
 
 - **Docker command fails in Jenkins**
   - Ensure Jenkins user has permission to access Docker daemon.

@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'scientific-calculator'
         CONTAINER_NAME = 'scientific-calculator-app'
+        MAVEN_IMAGE = 'maven:3.9.9-eclipse-temurin-17'
     }
 
     stages {
@@ -13,13 +14,25 @@ pipeline {
             }
         }
 
+        stage('Validate Environment') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'docker --version'
+                    } else {
+                        bat 'docker --version'
+                    }
+                }
+            }
+        }
+
         stage('Run Unit Tests') {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn -B clean test'
+                        sh 'docker run --rm -v "${WORKSPACE}:/app" -w /app ${MAVEN_IMAGE} mvn -B clean test'
                     } else {
-                        bat 'mvn -B clean test'
+                        bat 'docker run --rm -v "%WORKSPACE%:/app" -w /app %MAVEN_IMAGE% mvn -B clean test'
                     }
                 }
             }
@@ -29,9 +42,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn -B clean package -DskipTests'
+                        sh 'docker run --rm -v "${WORKSPACE}:/app" -w /app ${MAVEN_IMAGE} mvn -B clean package -DskipTests'
                     } else {
-                        bat 'mvn -B clean package -DskipTests'
+                        bat 'docker run --rm -v "%WORKSPACE%:/app" -w /app %MAVEN_IMAGE% mvn -B clean package -DskipTests'
                     }
                 }
             }
