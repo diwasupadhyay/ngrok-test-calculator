@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            width: 360px;
+            padding: 24px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 22px;
+            text-align: center;
+            color: #222;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            color: #444;
+            font-size: 14px;
+        }
+
+        input, select, button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cfd4da;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 16px;
+            border: none;
+            background: #1f6feb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1558bc;
+        }
+
+        .result {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #eef4ff;
+            color: #0a3e8c;
+            min-height: 22px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="calculator">
+    <h1>Scientific Calculator</h1>
+
+    <label for="operation">Operation</label>
+    <select id="operation">
+        <option value="add">Add (a + b)</option>
+        <option value="subtract">Subtract (a - b)</option>
+        <option value="multiply">Multiply (a × b)</option>
+        <option value="divide">Divide (a ÷ b)</option>
+        <option value="power">Power (a^b)</option>
+        <option value="sqrt">Square Root (√a)</option>
+        <option value="sin">Sin (degrees)</option>
+        <option value="cos">Cos (degrees)</option>
+        <option value="tan">Tan (degrees)</option>
+        <option value="log">Log10(a)</option>
+        <option value="ln">Ln(a)</option>
+        <option value="factorial">Factorial (a!)</option>
+    </select>
+
+    <label for="a">Value A</label>
+    <input id="a" type="number" step="any" placeholder="Enter first number">
+
+    <div id="bGroup">
+        <label for="b">Value B</label>
+        <input id="b" type="number" step="any" placeholder="Enter second number">
+    </div>
+
+    <button id="calculateBtn">Calculate</button>
+    <div class="result" id="resultBox">Result will appear here</div>
+</div>
+
+<script>
+    const operation = document.getElementById('operation');
+    const aInput = document.getElementById('a');
+    const bGroup = document.getElementById('bGroup');
+    const bInput = document.getElementById('b');
+    const resultBox = document.getElementById('resultBox');
+    const calculateBtn = document.getElementById('calculateBtn');
+
+    const unaryOps = ['sqrt', 'sin', 'cos', 'tan', 'log', 'ln', 'factorial'];
+
+    function toggleSecondInput() {
+        if (unaryOps.includes(operation.value)) {
+            bGroup.classList.add('hidden');
+            bInput.value = '';
+        } else {
+            bGroup.classList.remove('hidden');
+        }
+    }
+
+    operation.addEventListener('change', toggleSecondInput);
+    toggleSecondInput();
+
+    calculateBtn.addEventListener('click', async () => {
+        const op = operation.value;
+        const a = aInput.value;
+        const b = bInput.value;
+
+        if (a === '') {
+            resultBox.textContent = 'Please enter Value A.';
+            return;
+        }
+
+        let url = `/api/calculate?operation=${encodeURIComponent(op)}&a=${encodeURIComponent(a)}`;
+        if (!unaryOps.includes(op)) {
+            if (b === '') {
+                resultBox.textContent = 'Please enter Value B for this operation.';
+                return;
+            }
+            url += `&b=${encodeURIComponent(b)}`;
+        }
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (!res.ok) {
+                resultBox.textContent = `Error: ${data.error || 'Something went wrong.'}`;
+                return;
+            }
+
+            resultBox.textContent = `Result: ${data.result}`;
+        } catch (err) {
+            resultBox.textContent = 'Network error. Please try again.';
+        }
+    });
+</script>
+</body>
+</html>

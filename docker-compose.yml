@@ -1,0 +1,6 @@
+services:
+  calculator-app:
+    build: .
+    container_name: scientific-calculator-local
+    ports:
+      - "8080:8080"
