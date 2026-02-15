@@ -33,4 +33,4 @@ Open: `http://localhost:8080`
 mvn test
 ```
 
-For complete CI/CD + ngrok webhook setup, follow `GUIDE.md`.
+For complete CI/CD + ngrok webhook setup, follow `GUIDE.md` and try.
